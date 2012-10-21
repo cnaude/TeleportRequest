@@ -41,6 +41,7 @@ public class TRCommands implements CommandExecutor {
                 }
                 if (arg.equalsIgnoreCase("no")) {
                     // deny request
+                    plugin.denyRequest(player);
                     return true;
                 }
                 Player dstPlayer = Bukkit.getPlayerExact(arg);
@@ -48,8 +49,11 @@ public class TRCommands implements CommandExecutor {
                     sender.sendMessage(ChatColor.RED + "Player " + ChatColor.AQUA 
                             + arg + ChatColor.RED + " is not online!");
                     return true;
+                } else if (player.equals(dstPlayer)) {
+                    sender.sendMessage(ChatColor.RED + "Why would you do that!? ");
+                    return true;
                 } else {
-                    // send request to player
+                    // send tp request to dstPlayer from player
                     plugin.sendRequest(player, dstPlayer);
                     return true;
                 }

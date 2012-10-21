@@ -63,4 +63,19 @@ public class TR extends JavaPlugin {
             tpRequests.remove(dstName);
         }
     }
+    
+    public void denyRequest(Player dstPlayer) {
+        String dstName = dstPlayer.getName();
+        if (tpRequests.containsKey(dstName)) {
+            String sName = tpRequests.get(dstName);
+            Player requestor = Bukkit.getPlayerExact(sName);
+            dstPlayer.sendMessage(ChatColor.YELLOW + "Denying teleportation request from " + ChatColor.AQUA
+                        + sName + ChatColor.YELLOW + "!");
+            if (requestor != null) {
+                requestor.sendMessage(ChatColor.YELLOW + "Your teleportation request to " + ChatColor.AQUA
+                        + dstName + ChatColor.YELLOW + " was denied!");
+            } 
+            tpRequests.remove(dstName);
+        }
+    }
 }
