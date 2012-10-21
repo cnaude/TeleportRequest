@@ -5,6 +5,7 @@
 package me.cnaude.plugin.TeleportRequest;
 
 import java.util.HashMap;
+import java.util.Timer;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,6 +33,7 @@ public class TR extends JavaPlugin {
     public void sendRequest(Player requestor, Player dstPlayer) {
         String sName = requestor.getName();
         String dstName = dstPlayer.getName();
+        Timer timer = new Timer();
         if (tpRequests.containsKey(dstName)) {
             requestor.sendMessage(ChatColor.RED + "A teleport request to "
                     + ChatColor.AQUA + dstName + ChatColor.RED + " already exists!");
@@ -42,11 +44,14 @@ public class TR extends JavaPlugin {
                     + " has sent you a teleport request. Type "
                     + ChatColor.GREEN + "/rtp yes" + ChatColor.YELLOW + " to accept.");
             tpRequests.put(dstName, sName);
+            // timeout the request after time
+            timer.schedule(new TRTimeOut(this, dstPlayer), 120000); 
         }
     }
 
     public void acceptRequest(Player dstPlayer) {
         String dstName = dstPlayer.getName();
+        
         if (tpRequests.containsKey(dstName)) {
             String sName = tpRequests.get(dstName);
             Player requestor = Bukkit.getPlayerExact(sName);
@@ -55,7 +60,7 @@ public class TR extends JavaPlugin {
                         + sName + ChatColor.YELLOW + " to your location!");
                 requestor.sendMessage(ChatColor.YELLOW + "Teleporting you to " + ChatColor.AQUA
                         + dstName + ChatColor.YELLOW + "!");
-                requestor.teleport((Entity) dstPlayer);
+                requestor.teleport((Entity) dstPlayer);      
             } else {
                 dstPlayer.sendMessage(ChatColor.YELLOW + "Teleport requestor, " + ChatColor.AQUA
                         + sName + ChatColor.YELLOW + ", is not online!");
@@ -74,6 +79,21 @@ public class TR extends JavaPlugin {
             if (requestor != null) {
                 requestor.sendMessage(ChatColor.YELLOW + "Your teleportation request to " + ChatColor.AQUA
                         + dstName + ChatColor.YELLOW + " was denied!");
+            } 
+            tpRequests.remove(dstName);
+        }
+    }
+    
+    public void timeOutRequest(Player dstPlayer) {
+        String dstName = dstPlayer.getName();
+        if (tpRequests.containsKey(dstName)) {
+            String sName = tpRequests.get(dstName);
+            Player requestor = Bukkit.getPlayerExact(sName);
+            dstPlayer.sendMessage(ChatColor.YELLOW + "Teleportation request from " + ChatColor.AQUA
+                        + sName + ChatColor.YELLOW + " has timed out!");
+            if (requestor != null) {
+                requestor.sendMessage(ChatColor.YELLOW + "Your teleportation request to " + ChatColor.AQUA
+                        + dstName + ChatColor.YELLOW + " has timed out!");
             } 
             tpRequests.remove(dstName);
         }
