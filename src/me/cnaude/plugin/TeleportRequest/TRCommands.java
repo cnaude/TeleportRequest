@@ -36,12 +36,12 @@ public class TRCommands implements CommandExecutor {
                 String arg = args[0];
                 if (arg.equalsIgnoreCase("yes")) {
                     // accept request
-                    plugin.acceptRequest(player);
+                    plugin.acceptRequest(player, "all");
                     return true;
                 }
                 if (arg.equalsIgnoreCase("no")) {
                     // deny request
-                    plugin.denyRequest(player);
+                    plugin.denyRequest(player, "all");
                     return true;
                 }
                 Player dstPlayer = Bukkit.getPlayerExact(arg);

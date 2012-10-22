@@ -13,15 +13,17 @@ import org.bukkit.entity.Player;
  */
 public class TRTimeOut extends TimerTask {
     private Player dstPlayer;
+    private String sName;
     TR plugin;
 
-    public TRTimeOut(TR instance, Player player) {
+    public TRTimeOut(TR instance, Player player, String s) {
         dstPlayer = player;
+        sName = s;
         plugin = instance;
     }
 
     @Override
     public void run() {
-        plugin.timeOutRequest(dstPlayer);
+        plugin.timeOutRequest(dstPlayer, sName);
     }
 }
