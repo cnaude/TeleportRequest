@@ -25,8 +25,7 @@ public class TR extends JavaPlugin {
     public static final String PLUGIN_NAME = "TeleportRequest";
     public static final String LOG_HEADER = "[" + PLUGIN_NAME + "]";
     static final Logger log = Logger.getLogger("Minecraft");
-    // destination player, requestor
-    //public static HashMap<String, String> tpRequests = new HashMap<String, String>();
+    // destination player, requestor(s)
     public static HashMap<String, List<String>> tpRequests = new HashMap<String, List<String>>();
 
     @Override
