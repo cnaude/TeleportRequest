@@ -6,7 +6,6 @@ package me.cnaude.plugin.TeleportRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.logging.Logger;
@@ -59,7 +58,7 @@ public class TR extends JavaPlugin {
                 + ChatColor.AQUA + dstName + ChatColor.YELLOW + "!");
         dstPlayer.sendMessage(ChatColor.AQUA + sName + ChatColor.YELLOW
                 + " has sent you a teleport request. Type "
-                + ChatColor.GREEN + "/rtp yes" + ChatColor.YELLOW + " to accept.");
+                + ChatColor.GREEN + "/rtp yes ([player|all])" + ChatColor.YELLOW + " to accept.");
         tpRequests.get(dstName).add(sName);
         // timeout the request after time
         timer.schedule(new TRTimeOut(this, dstPlayer, sName), 120000);           
@@ -67,86 +66,65 @@ public class TR extends JavaPlugin {
 
     public void acceptRequest(Player dstPlayer, String sName) {
         String dstName = dstPlayer.getName();
-        ArrayList<String> sNames = new ArrayList<String>();
-
-        if (sName.equalsIgnoreCase("all")) {
-            if (tpRequests.containsKey(dstName)) {
-                for (String s : tpRequests.get(dstName)) {
-                    sNames.add(s);
-                }
-            } else {
-                return;
-            }
-        } else {
-            sNames.add(sName);
-        }
-        
+        ArrayList<String> remainingNames = new ArrayList<String>();
+                        
         if (tpRequests.containsKey(dstName)) {
-            for (int x = sNames.size(); x > 0; x--) {
-                String s = sNames.get(x);
-                Player requestor = Bukkit.getPlayerExact(s);
-                if (requestor != null) {
-                    dstPlayer.sendMessage(ChatColor.YELLOW + "Teleporting " + ChatColor.AQUA
-                            + s + ChatColor.YELLOW + " to your location!");
-                    requestor.sendMessage(ChatColor.YELLOW + "Teleporting you to " + ChatColor.AQUA
-                            + dstName + ChatColor.YELLOW + "!");
-                    requestor.teleport((Entity) dstPlayer);
+            for (String s : tpRequests.get(dstName)) {
+                if (s.equalsIgnoreCase(sName) || sName.equalsIgnoreCase("all")) {
+                    Player requestor = Bukkit.getPlayerExact(s);
+                    if (requestor != null) {
+                        dstPlayer.sendMessage(ChatColor.YELLOW + "Teleporting " + ChatColor.AQUA
+                                + s + ChatColor.YELLOW + " to your location!");
+                        requestor.sendMessage(ChatColor.YELLOW + "Teleporting you to " + ChatColor.AQUA
+                                + dstName + ChatColor.YELLOW + "!");
+                        requestor.teleport((Entity) dstPlayer);
+                    } else {
+                        dstPlayer.sendMessage(ChatColor.YELLOW + "Teleport requestor, " + ChatColor.AQUA
+                                + s + ChatColor.YELLOW + ", is not online!");
+                    }
                 } else {
-                    dstPlayer.sendMessage(ChatColor.YELLOW + "Teleport requestor, " + ChatColor.AQUA
-                            + s + ChatColor.YELLOW + ", is not online!");
+                    remainingNames.add(s);
                 }
-                sNames.remove(x);
             }
             // remove all requests
             tpRequests.remove(dstName);
             // replace with new list, even if empty
-            tpRequests.put(dstName, sNames);
+            tpRequests.put(dstName, remainingNames);
         }
     }
 
     public void denyRequest(Player dstPlayer, String sName) {
         String dstName = dstPlayer.getName();
-        ArrayList<String> sNames = new ArrayList<String>();
-
-        if (sName.equalsIgnoreCase("all")) {
-            if (tpRequests.containsKey(dstName)) {
-                for (String s : tpRequests.get(dstName)) {
-                    sNames.add(s);
-                }
-            } else {
-                return;
-            }
-        } else {
-            sNames.add(sName);
-        }
-        
+        ArrayList<String> remainingNames = new ArrayList<String>();
+       
         if (tpRequests.containsKey(dstName)) {
-            for (int x = sNames.size(); x > 0; x--) {
-                String s = sNames.get(x);
-                Player requestor = Bukkit.getPlayerExact(s);
-                dstPlayer.sendMessage(ChatColor.YELLOW + "Denying teleportation request from " + ChatColor.AQUA
-                        + s + ChatColor.YELLOW + "!");
-                if (requestor != null) {
-                    requestor.sendMessage(ChatColor.YELLOW + "Your teleportation request to " + ChatColor.AQUA
-                            + dstName + ChatColor.YELLOW + " was denied!");
+            for (String s : tpRequests.get(dstName)) {
+                if (s.equalsIgnoreCase(sName) || sName.equalsIgnoreCase("all")) {
+                    Player requestor = Bukkit.getPlayerExact(s);
+                    dstPlayer.sendMessage(ChatColor.YELLOW + "Denying teleportation request from " + ChatColor.AQUA
+                            + s + ChatColor.YELLOW + "!");
+                    if (requestor != null) {
+                        requestor.sendMessage(ChatColor.YELLOW + "Your teleportation request to " + ChatColor.AQUA
+                                + dstName + ChatColor.YELLOW + " was denied!");
+                    }
+                } else {
+                    remainingNames.add(s);
                 }
-                sNames.remove(x);
             }
             // remove all requests
             tpRequests.remove(dstName);
             // replace with new list, even if empty
-            tpRequests.put(dstName, sNames);
+            tpRequests.put(dstName, remainingNames);
         }
     }
 
     public void timeOutRequest(Player dstPlayer, String sName) {
-        String dstName = dstPlayer.getName();
-        ArrayList<String> sNames = new ArrayList<String>();
-        
+        String dstName = dstPlayer.getName();       
+        ArrayList<String> remainingNames = new ArrayList<String>();
+       
         if (tpRequests.containsKey(dstName)) {
-            for (int x = sNames.size(); x > 0; x--) {
-                String s = sNames.get(x);
-                if (s.equals(sName)) {
+            for (String s : tpRequests.get(dstName)) {
+                if (s.equalsIgnoreCase(sName) || sName.equalsIgnoreCase("all")) {
                     Player requestor = Bukkit.getPlayerExact(s);
                     dstPlayer.sendMessage(ChatColor.YELLOW + "Teleportation request from " + ChatColor.AQUA
                             + s + ChatColor.YELLOW + " has timed out!");
@@ -154,13 +132,14 @@ public class TR extends JavaPlugin {
                         requestor.sendMessage(ChatColor.YELLOW + "Your teleportation request to " + ChatColor.AQUA
                                 + dstName + ChatColor.YELLOW + " has timed out!");
                     }
-                    sNames.remove(x);
-                    // remove all requests
-                    tpRequests.remove(dstName);
-                    // replace with new list, even if empty
-                    tpRequests.put(dstName, sNames);
+                } else {
+                    remainingNames.add(s);
                 }
             }
+            // remove all requests
+            tpRequests.remove(dstName);
+            // replace with new list, even if empty
+            tpRequests.put(dstName, remainingNames);                                
         }
     }
 }

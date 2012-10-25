@@ -7,9 +7,9 @@ commands:
     rtp:
         description: Send a teleport request to another player.
         usage: |
-               /<command> [player|yes|no]
+               /<command> [player|yes|no] ([player|all])
                /rtp [player] - Send a teleport request to [player]. 
-               /rtp [yes|no] - Accept or deny teleport request from another player.
+               /rtp [yes|no] ([player|all]) - Accept or deny teleport request from another player(s).
 permissions: 
     teleportrequest.rtp:
         description: Gives player access to /rtp.

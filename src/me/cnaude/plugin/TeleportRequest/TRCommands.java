@@ -57,6 +57,21 @@ public class TRCommands implements CommandExecutor {
                     plugin.sendRequest(player, dstPlayer);
                     return true;
                 }
+            } else if (args.length >= 2) {
+                String arg = args[0];
+                for (int x = 1; x < args.length; x++) {
+                    String pName = args[x];
+                    if (arg.equalsIgnoreCase("yes")) {
+                        // accept request
+                        plugin.acceptRequest(player, pName);                        
+                    } else if (arg.equalsIgnoreCase("no")) {
+                        // deny request
+                        plugin.denyRequest(player, pName);                        
+                    } else {
+                        return false;
+                    }     
+                }
+                return true;
             } else {
                 return false;
             }
