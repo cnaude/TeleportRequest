@@ -27,6 +27,10 @@ public class TRCommands implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player)sender;
+            if (player.isDead()) {
+                sender.sendMessage(ChatColor.RED + "You are dead!!");
+                return true;
+            }
             if (!sender.hasPermission("teleportrequest.rtp")) {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
                 return true;
@@ -57,21 +61,6 @@ public class TRCommands implements CommandExecutor {
                     plugin.sendRequest(player, dstPlayer);
                     return true;
                 }
-            } else if (args.length >= 2) {
-                String arg = args[0];
-                for (int x = 1; x < args.length; x++) {
-                    String pName = args[x];
-                    if (arg.equalsIgnoreCase("yes")) {
-                        // accept request
-                        plugin.acceptRequest(player, pName);                        
-                    } else if (arg.equalsIgnoreCase("no")) {
-                        // deny request
-                        plugin.denyRequest(player, pName);                        
-                    } else {
-                        return false;
-                    }     
-                }
-                return true;
             } else {
                 return false;
             }
