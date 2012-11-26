@@ -34,7 +34,8 @@ public class TR extends JavaPlugin {
     
     private static int reqTimeOut = 120;
     private static int reqMax = 10;
-    private static boolean enablePermissions = true;
+    private static boolean enablePerms = true;
+    private static boolean reqFullName = true;
 
     @Override
     public void onEnable() {
@@ -48,7 +49,11 @@ public class TR extends JavaPlugin {
     }
     
     public boolean enablePerms() {
-        return enablePermissions;
+        return enablePerms;
+    }
+    
+    public boolean reqFullName() {
+        return reqFullName;
     }
 
     public void sendRequest(Player requestor, Player dstPlayer) {
@@ -216,7 +221,8 @@ public class TR extends JavaPlugin {
     private void loadConfig() {        
         reqTimeOut = getConfig().getInt("request-timeout");
         reqMax = getConfig().getInt("request-max");
-        enablePermissions = getConfig().getBoolean("permissions");
+        enablePerms = getConfig().getBoolean("permissions");
+        reqFullName = getConfig().getBoolean("require-full-name");
     }
             
     public void logInfo(String _message) {

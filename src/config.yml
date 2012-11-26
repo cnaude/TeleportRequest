@@ -4,3 +4,5 @@ request-timeout: 120
 permissions: true
 # Maximum requests a player can receive
 request-max: 10
+# Require player names to be exact (not case sensitive)
+require-full-name: true

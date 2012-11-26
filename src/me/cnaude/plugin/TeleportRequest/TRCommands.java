@@ -50,7 +50,21 @@ public class TRCommands implements CommandExecutor {
                         plugin.denyRequest(player, "all");
                         return true;
                     }
-                    Player dstPlayer = Bukkit.getPlayerExact(arg);
+                    Player dstPlayer = null;
+                    if (plugin.reqFullName()) {
+                        dstPlayer = Bukkit.getPlayerExact(arg);
+                    } else {
+                        // First we attempt to get an exact match before partial match
+                        dstPlayer = Bukkit.getPlayerExact(arg);
+                        if (dstPlayer == null) {
+                            for (Player pl : Bukkit.getOnlinePlayers()) {
+                                if (pl.getName().toLowerCase().startsWith(arg.toLowerCase())) {
+                                    dstPlayer = Bukkit.getPlayer(arg);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (dstPlayer == null) {
                         sender.sendMessage(ChatColor.RED + "Player " + ChatColor.AQUA 
                                 + arg + ChatColor.RED + " is not online!");

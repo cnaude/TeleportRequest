@@ -1,6 +1,6 @@
 name: TeleportRequest
 main: me.cnaude.plugin.TeleportRequest.TR
-version: 0.3.0
+version: 0.4.0
 description: Send teleport reuqests to other players!
 author: Chris Naude
 commands:
