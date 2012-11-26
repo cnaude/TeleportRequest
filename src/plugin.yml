@@ -1,6 +1,6 @@
 name: TeleportRequest
 main: me.cnaude.plugin.TeleportRequest.TR
-version: 0.1.0
+version: 0.3.0
 description: Send teleport reuqests to other players!
 author: Chris Naude
 commands:
@@ -14,3 +14,12 @@ permissions:
     teleportrequest.rtp:
         description: Gives player access to /rtp.
         default: false 
+    rtp.use:
+        description: Gives player access to /rtp.
+        default: false 
+    teleportrequest.admin:
+        description: Allows players to send rtp requests without the need for approval from the destination player.
+        default: false 
+    rtp.admin:
+        description: Allows players to send rtp requests without the need for approval from the destination player.
+        default: false         

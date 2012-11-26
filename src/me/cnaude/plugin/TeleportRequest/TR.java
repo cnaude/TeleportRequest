@@ -4,10 +4,12 @@
  */
 package me.cnaude.plugin.TeleportRequest;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,16 +22,33 @@ import org.bukkit.plugin.java.JavaPlugin;
  * @author cnaude
  */
 public class TR extends JavaPlugin {
-
     public static final String PLUGIN_NAME = "TeleportRequest";
     public static final String LOG_HEADER = "[" + PLUGIN_NAME + "]";
     static final Logger log = Logger.getLogger("Minecraft");
     // destination player, requestor(s)
     public static HashMap<String, List<String>> tpRequests = new HashMap<String, List<String>>();
+    public static HashMap<String, List<String>> ignoreRequests = new HashMap<String, List<String>>();
+        
+    private File pluginFolder;
+    private File configFile;
+    
+    private static int reqTimeOut = 120;
+    private static int reqMax = 10;
+    private static boolean enablePermissions = true;
 
     @Override
     public void onEnable() {
+        pluginFolder = getDataFolder();
+        configFile = new File(pluginFolder, "config.yml");
+        createConfig();
+        this.getConfig().options().copyDefaults(true);
+        saveConfig();
+        loadConfig();
         getCommand("rtp").setExecutor(new TRCommands(this));
+    }
+    
+    public boolean enablePerms() {
+        return enablePermissions;
     }
 
     public void sendRequest(Player requestor, Player dstPlayer) {
@@ -38,7 +57,7 @@ public class TR extends JavaPlugin {
         Timer timer = new Timer();
 
         if (tpRequests.containsKey(dstName)) {
-            if (tpRequests.get(dstName).size() >= 10) {
+            if (tpRequests.get(dstName).size() >= reqMax) {
                 requestor.sendMessage(ChatColor.RED + "Player " + ChatColor.AQUA
                         + dstName + ChatColor.RED + " has too many teleportation requests!");
                 return;
@@ -61,7 +80,40 @@ public class TR extends JavaPlugin {
                 + ChatColor.GREEN + "/rtp yes ([player|all])" + ChatColor.YELLOW + " to accept.");
         tpRequests.get(dstName).add(sName);
         // timeout the request after time
-        timer.schedule(new TRTimeOut(this, dstPlayer, sName), 120000);           
+        timer.schedule(new TRTimeOut(this, dstPlayer, sName), (reqTimeOut * 1000));           
+    }
+    
+    public void ignoreRequest(Player player, Player badPlayer) {
+        String sName = player.getName();
+        String badName = badPlayer.getName();
+
+        if (!ignoreRequests.containsKey(sName)) {
+            ignoreRequests.put(sName, new ArrayList<String>());
+        }
+
+        for (String s : ignoreRequests.get(sName)) {
+            if (s.equalsIgnoreCase(badName)) {
+                player.sendMessage(ChatColor.RED + "You are already ignoring teleportation requests from " 
+                        + ChatColor.AQUA + badName + ChatColor.RED + "!");
+                return;
+            }
+        }
+        player.sendMessage(ChatColor.YELLOW + "Now ignoring teleportation requests from "
+                + ChatColor.AQUA + badName + ChatColor.YELLOW + "!");
+        ignoreRequests.get(sName).add(badName);     
+    }
+    
+    public boolean isIgnored(Player dstPlayer, String sName) {
+        String dstName = dstPlayer.getName();
+        if (!ignoreRequests.containsKey(dstName)) {
+            return false;
+        }
+        for (String s : ignoreRequests.get(dstName)) {
+            if (s.equalsIgnoreCase(sName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void acceptRequest(Player dstPlayer, String sName) {
@@ -141,5 +193,37 @@ public class TR extends JavaPlugin {
             // replace with new list, even if empty
             tpRequests.put(dstName, remainingNames);                                
         }
+    }
+    
+    private void createConfig() {
+        if (!pluginFolder.exists()) {
+            try {
+                pluginFolder.mkdir();
+            } catch (Exception e) {
+                logInfo("ERROR: " + e.getMessage());                
+            }
+        }
+
+        if (!configFile.exists()) {
+            try {
+                configFile.createNewFile();
+            } catch (Exception e) {
+                logInfo("ERROR: " + e.getMessage());
+            }
+        }
+    }
+        
+    private void loadConfig() {        
+        reqTimeOut = getConfig().getInt("request-timeout");
+        reqMax = getConfig().getInt("request-max");
+        enablePermissions = getConfig().getBoolean("permissions");
+    }
+            
+    public void logInfo(String _message) {
+        log.log(Level.INFO, String.format("%s %s", LOG_HEADER, _message));
+    }
+
+    public void logError(String _message) {
+        log.log(Level.SEVERE, String.format("%s %s", LOG_HEADER, _message));
     }
 }

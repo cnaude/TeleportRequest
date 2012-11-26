@@ -1,0 +1,6 @@
+# The number of seconds until an rtp request automatically times out
+request-timeout: 120
+# Enable permissions
+permissions: true
+# Maximum requests a player can receive
+request-max: 10
